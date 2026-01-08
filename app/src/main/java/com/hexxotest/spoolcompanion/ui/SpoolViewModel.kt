@@ -32,15 +32,23 @@ class SpoolViewModel(spoolmanUrl: String) : ViewModel() {
     private fun getSpools() {
         viewModelScope.launch {
             currentUiState = try {
+                Log.d("SpoolViewModel", "Fetching spools from URL: $url")
                 val spoolApi = SpoolApi(baseUrl = url)
                 val spools = spoolApi.retrofitService.getSpoolList()
+                Log.d("SpoolViewModel", "Successfully fetched ${spools.size} spools")
                 val entries = spools.map { spool ->
+                    val color = try {
+                        Color(android.graphics.Color.parseColor("#${spool.filament.color_hex}"))
+                    } catch (e: Exception) {
+                        Log.w("SpoolViewModel", "Invalid color for spool ${spool.id}: '${spool.filament.color_hex}'")
+                        Color.Gray
+                    }
                     SpoolListEntry(
                         id = spool.id,
                         filamentId = spool.filament.id,
                         vendorName = spool.filament.vendor.name,
                         name = spool.filament.name,
-                        color = Color(android.graphics.Color.parseColor("#${spool.filament.color_hex}")),
+                        color = color,
                         material = spool.filament.material,
                         weight = convertWeightDoubleToString(spool.filament.weight),
                         diameter = spool.filament.diameter,
@@ -49,6 +57,10 @@ class SpoolViewModel(spoolmanUrl: String) : ViewModel() {
                 }
                 UiState.Success(entries)
             } catch (e: Exception) {
+                Log.e("SpoolViewModel", "Error loading spools", e)
+                Log.e("SpoolViewModel", "Error type: ${e.javaClass.simpleName}")
+                Log.e("SpoolViewModel", "Error message: ${e.message}")
+                e.printStackTrace()
                 UiState.Error
             }
         }
