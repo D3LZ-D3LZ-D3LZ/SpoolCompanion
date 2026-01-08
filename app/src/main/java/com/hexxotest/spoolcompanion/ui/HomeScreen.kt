@@ -90,6 +90,15 @@ fun colorToName(color: Color): String {
     }
 }
 
+fun extractWeightValue(weightString: String): Double {
+    val numericValue = weightString.split(" ")[0]
+    val unit = weightString.split(" ").getOrElse(1) { "g" }
+    return when (unit) {
+        "kg" -> numericValue.toDouble() * 1000
+        else -> numericValue.toDouble()
+    }
+}
+
 @Composable
 // Main Screen selector : switch between Spool list, loading animation or error message
 fun HomeScreen(
@@ -176,7 +185,7 @@ fun SpoolEntry(
             nfcTagViewModel.colorName = colorToName(spool.color)
             nfcTagViewModel.filamentColors = listOf(spool.color)
             nfcTagViewModel.diameter = spool.diameter
-            nfcTagViewModel.weight = spool.weight.toDouble()
+            nfcTagViewModel.weight = extractWeightValue(spool.weight)
             nfcTagViewModel.printTemp = 220.0
             nfcTagViewModel.bedTemp = 60.0
             nfcTagViewModel.density = 1.24
