@@ -97,34 +97,40 @@ class MainActivity : ComponentActivity() {
                 Parcelable::class.java
             ) as Tag
             if (nfcTagViewModel.isDialogShown) {
-                Log.w(
-                    "NFC",
-                    "SPOOL:${nfcTagViewModel.spoolId} | FILAMENT:${nfcTagViewModel.filamentId}"
-                )
+                try {
+                    Log.w(
+                        "NFC",
+                        "SPOOL:${nfcTagViewModel.spoolId} | FILAMENT:${nfcTagViewModel.filamentId}"
+                    )
 
-                val openTagData = nfcTagViewModel.getOpenTag3D()
-                val openTagBytes = openTagData.encodeToBytes()
+                    val openTagData = nfcTagViewModel.getOpenTag3D()
+                    val openTagBytes = openTagData.encodeToBytes()
+                    Log.d("NFC", "OpenTag3D data size: ${openTagBytes.size} bytes")
 
-                val textRecord = NdefRecord.createTextRecord(
-                    null,
-                    "SPOOL:${nfcTagViewModel.spoolId}\nFILAMENT:${nfcTagViewModel.filamentId}"
-                )
+                    val textRecord = NdefRecord.createTextRecord(
+                        null,
+                        "SPOOL:${nfcTagViewModel.spoolId}\nFILAMENT:${nfcTagViewModel.filamentId}"
+                    )
 
-                val opentagRecord = NdefRecord(
-                    NdefRecord.TNF_MIME_MEDIA,
-                    OpenTag3D.MIME_TYPE.toByteArray(Charsets.UTF_8),
-                    ByteArray(0),
-                    openTagBytes
-                )
+                    val opentagRecord = NdefRecord(
+                        NdefRecord.TNF_MIME_MEDIA,
+                        OpenTag3D.MIME_TYPE.toByteArray(Charsets.UTF_8),
+                        ByteArray(0),
+                        openTagBytes
+                    )
 
-                val msg = NdefMessage(textRecord, opentagRecord)
+                    val msg = NdefMessage(textRecord, opentagRecord)
 
-                Ndef.get(tag).use {
-                    it.connect()
-                    it.writeNdefMessage(msg)
+                    Ndef.get(tag).use {
+                        it.connect()
+                        it.writeNdefMessage(msg)
+                    }
+
+                    nfcTagViewModel.isDialogShown = false
+                } catch (e: Exception) {
+                    Log.e("NFC", "Error writing NFC tag", e)
+                    e.printStackTrace()
                 }
-
-                nfcTagViewModel.isDialogShown = false
             }
         }
     }

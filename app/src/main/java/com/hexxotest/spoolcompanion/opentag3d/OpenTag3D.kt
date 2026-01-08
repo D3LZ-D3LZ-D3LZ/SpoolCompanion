@@ -21,30 +21,22 @@ data class OpenTag3D(
         data.add((tagVersion shr 8).toByte())
         data.add((tagVersion and 0xFF).toByte())
 
-        data.addAll(materialBase.toByteArray(Charsets.UTF_8).take(5).toMutableList())
-        data.addAll(materialMod.toByteArray(Charsets.UTF_8).take(5).toMutableList())
-        data.addAll(manufacturer.toByteArray(Charsets.UTF_8).take(16).toMutableList())
-        data.addAll(colorName.toByteArray(Charsets.UTF_8).take(32).toMutableList())
+        materialBase.toByteArray(Charsets.UTF_8).take(5).forEach { data.add(it) }
+        materialMod.toByteArray(Charsets.UTF_8).take(5).forEach { data.add(it) }
+        manufacturer.toByteArray(Charsets.UTF_8).take(16).forEach { data.add(it) }
+        colorName.toByteArray(Charsets.UTF_8).take(32).forEach { data.add(it) }
 
-        data.addAll(encodeColor(colors.getOrElse(0) { Color.Black }))
-        data.addAll(encodeColor(colors.getOrElse(1) { Color(0x00000000) }))
-        data.addAll(encodeColor(colors.getOrElse(2) { Color(0x00000000) }))
-        data.addAll(encodeColor(colors.getOrElse(3) { Color(0x00000000) }))
+        encodeColor(colors.getOrElse(0) { Color.Black }).forEach { data.add(it) }
+        encodeColor(colors.getOrElse(1) { Color(0x00000000) }).forEach { data.add(it) }
+        encodeColor(colors.getOrElse(2) { Color(0x00000000) }).forEach { data.add(it) }
+        encodeColor(colors.getOrElse(3) { Color(0x00000000) }).forEach { data.add(it) }
 
-        val diameterBytes = ((targetDiameter * 1000).toInt()).toBigEndianBytes()
-        data.addAll(diameterBytes.toList())
-
-        val weightBytes = (targetWeight.toInt()).toBigEndianBytes()
-        data.addAll(weightBytes.toList())
-
+        ((targetDiameter * 1000).toInt()).toBigEndianBytes().forEach { data.add(it) }
+        (targetWeight.toInt()).toBigEndianBytes().forEach { data.add(it) }
         data.add((printTemp / 5).toInt().toByte())
         data.add((bedTemp / 5).toInt().toByte())
-
-        val densityBytes = ((density * 1000).toInt()).toBigEndianBytes()
-        data.addAll(densityBytes.toList())
-
-        val tdBytes = 0.toBigEndianBytes()
-        data.addAll(tdBytes.toList())
+        ((density * 1000).toInt()).toBigEndianBytes().forEach { data.add(it) }
+        0.toBigEndianBytes().forEach { data.add(it) }
 
         return data.toByteArray()
     }
