@@ -13,6 +13,9 @@ import android.os.Bundle
 import android.os.Parcelable
 import android.util.Log
 import androidx.activity.ComponentActivity
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.hexxotest.spoolcompanion.opentag3d.OpenTag3D
+import java.nio.charset.Charset
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
@@ -98,16 +101,29 @@ class MainActivity : ComponentActivity() {
                     "NFC",
                     "SPOOL:${nfcTagViewModel.spoolId} | FILAMENT:${nfcTagViewModel.filamentId}"
                 )
-                val msg = NdefMessage(
-                    NdefRecord.createTextRecord(
-                        null,
-                        "SPOOL:${nfcTagViewModel.spoolId}\nFILAMENT:${nfcTagViewModel.filamentId}"
-                    )
+
+                val openTagData = nfcTagViewModel.getOpenTag3D()
+                val openTagBytes = openTagData.encodeToBytes()
+
+                val textRecord = NdefRecord.createTextRecord(
+                    null,
+                    "SPOOL:${nfcTagViewModel.spoolId}\nFILAMENT:${nfcTagViewModel.filamentId}"
                 )
+
+                val opentagRecord = NdefRecord(
+                    NdefRecord.TNF_MIME_MEDIA,
+                    OpenTag3D.MIME_TYPE.toByteArray(Charsets.UTF_8),
+                    ByteArray(0),
+                    openTagBytes
+                )
+
+                val msg = NdefMessage(textRecord, opentagRecord)
+
                 Ndef.get(tag).use {
                     it.connect()
                     it.writeNdefMessage(msg)
                 }
+
                 nfcTagViewModel.isDialogShown = false
             }
         }

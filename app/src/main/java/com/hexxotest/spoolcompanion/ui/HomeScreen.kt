@@ -40,6 +40,55 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.hexxotest.spoolcompanion.R
 import com.hexxotest.spoolcompanion.models.SpoolListEntry
+import kotlin.math.roundToInt
+
+fun extractMaterialBase(material: String): String {
+    return when {
+        material.contains("PLA") -> "PLA"
+        material.contains("PETG") -> "PETG"
+        material.contains("PCTFE") -> "PCTFE"
+        material.contains("TPU") -> "TPU"
+        material.contains("ABS") -> "ABS"
+        material.contains("ASA") -> "ASA"
+        material.contains("PC") && !material.contains("CF") -> "PC"
+        material.contains("PC") && material.contains("CF") -> "PCF"
+        material.contains("PA") -> "PA"
+        material.contains("Nylon") -> "PA"
+        material.contains("PP") -> "PP"
+        else -> material.take(5).uppercase()
+    }
+}
+
+fun extractMaterialMod(material: String): String {
+    return when {
+        material.contains("CF") -> "CF"
+        material.contains("HF") -> "HF"
+        material.contains("Pro") -> "Pro"
+        material.contains("Silk") -> "Silk"
+        material.contains("+") && material.contains("HS") -> "HS"
+        material.contains("+") && !material.contains("HS") -> "+"
+        material.contains("95A") -> "95A"
+        material.contains("Luminous") -> "Glow"
+        else -> ""
+    }
+}
+
+fun colorToName(color: Color): String {
+    val argb = (color.value and 0xFFFFFFFFUL)
+    val r = ((argb shr 16) and 0xFFUL).toInt()
+    val g = ((argb shr 8) and 0xFFUL).toInt()
+    val b = (argb and 0xFFUL).toInt()
+    return when {
+        r == 255 && g == 255 && b == 255 -> "White"
+        r == 0 && g == 0 && b == 0 -> "Black"
+        r > g && g > b -> "Red"
+        g > r && g > b -> "Green"
+        b > r && b > g -> "Blue"
+        r + g + b > 600 -> "Light"
+        r + g + b < 300 -> "Dark"
+        else -> "Custom"
+    }
+}
 
 @Composable
 // Main Screen selector : switch between Spool list, loading animation or error message
@@ -120,6 +169,17 @@ fun SpoolEntry(
             nfcTagViewModel.isDialogShown = true
             nfcTagViewModel.spoolId = spool.id
             nfcTagViewModel.filamentId = spool.filamentId
+            nfcTagViewModel.spoolName = spool.name
+            nfcTagViewModel.vendorName = spool.vendorName
+            nfcTagViewModel.materialBase = extractMaterialBase(spool.material)
+            nfcTagViewModel.materialMod = extractMaterialMod(spool.material)
+            nfcTagViewModel.colorName = colorToName(spool.color)
+            nfcTagViewModel.filamentColors = listOf(spool.color)
+            nfcTagViewModel.diameter = spool.diameter
+            nfcTagViewModel.weight = spool.weight.toDouble()
+            nfcTagViewModel.printTemp = 220.0
+            nfcTagViewModel.bedTemp = 60.0
+            nfcTagViewModel.density = 1.24
         },
         modifier = modifier
             .fillMaxWidth()
