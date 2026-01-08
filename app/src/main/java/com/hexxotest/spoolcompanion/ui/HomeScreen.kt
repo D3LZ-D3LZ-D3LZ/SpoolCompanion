@@ -43,18 +43,19 @@ import com.hexxotest.spoolcompanion.models.SpoolListEntry
 import kotlin.math.roundToInt
 
 fun extractMaterialBase(material: String): String {
+    val materialUpper = material.uppercase()
     return when {
-        material.contains("PLA") -> "PLA"
-        material.contains("PETG") -> "PETG"
-        material.contains("PCTFE") -> "PCTFE"
-        material.contains("TPU") -> "TPU"
-        material.contains("ABS") -> "ABS"
-        material.contains("ASA") -> "ASA"
-        material.contains("PC") && !material.contains("CF") -> "PC"
-        material.contains("PC") && material.contains("CF") -> "PCF"
-        material.contains("PA") -> "PA"
-        material.contains("Nylon") -> "PA"
-        material.contains("PP") -> "PP"
+        materialUpper.contains("PLA") -> "PLA"
+        materialUpper.contains("PETG") -> "PETG"
+        materialUpper.contains("PCTFE") -> "PCTFE"
+        materialUpper.contains("TPU") -> "TPU"
+        materialUpper.contains("ABS") -> "ABS"
+        materialUpper.contains("ASA") -> "ASA"
+        materialUpper.contains("PA") || materialUpper.contains("NYLON") -> "PA"
+        materialUpper.contains("PP") -> "PP"
+        materialUpper.contains("PC") && materialUpper.contains("CF") -> "PCF"
+        materialUpper.contains("PC") -> "PC"
+        materialUpper.contains("PET") && !materialUpper.contains("PETG") -> "PET"
         else -> material.take(5).uppercase()
     }
 }
@@ -74,18 +75,9 @@ fun extractMaterialMod(material: String): String {
 }
 
 fun colorToName(color: Color): String {
-    val argb = (color.value and 0xFFFFFFFFUL)
-    val r = ((argb shr 16) and 0xFFUL).toInt()
-    val g = ((argb shr 8) and 0xFFUL).toInt()
-    val b = (argb and 0xFFUL).toInt()
     return when {
-        r == 255 && g == 255 && b == 255 -> "White"
-        r == 0 && g == 0 && b == 0 -> "Black"
-        r > g && g > b -> "Red"
-        g > r && g > b -> "Green"
-        b > r && b > g -> "Blue"
-        r + g + b > 600 -> "Light"
-        r + g + b < 300 -> "Dark"
+        (color == androidx.compose.ui.graphics.Color.White) -> "White"
+        (color == androidx.compose.ui.graphics.Color.Black) -> "Black"
         else -> "Custom"
     }
 }
