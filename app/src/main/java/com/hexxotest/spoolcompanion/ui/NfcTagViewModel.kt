@@ -23,24 +23,30 @@ class NfcTagViewModel : ViewModel() {
     var materialMod by mutableStateOf("")
     var colorName by mutableStateOf("")
     var filamentColors by mutableStateOf(emptyList<Color>())
-    var diameter by mutableStateOf(0.0)
-    var weight by mutableStateOf(0.0)
+    var diameter by mutableStateOf(1.75)
+    var weight by mutableStateOf(1000.0)
     var printTemp by mutableStateOf(220.0)
     var bedTemp by mutableStateOf(60.0)
     var density by mutableStateOf(1.24)
 
     fun getOpenTag3D(): OpenTag3D {
+        val actualDiameter = if (diameter == 0.0) 1.75 else diameter
+        val actualWeight = if (weight == 0.0) 1000.0 else weight
+        val actualDensity = if (density == 0.0) 1.24 else density
+        val actualPrintTemp = if (printTemp == 220.0) 220.0 else printTemp
+        val actualBedTemp = if (bedTemp == 60.0) 60.0 else bedTemp
+
         return OpenTag3D(
-            materialBase = materialBase,
+            materialBase = if (materialBase.isEmpty()) "PLA" else materialBase,
             materialMod = materialMod,
-            manufacturer = vendorName,
-            colorName = colorName,
-            colors = filamentColors,
-            targetDiameter = diameter,
-            targetWeight = weight,
-            printTemp = printTemp,
-            bedTemp = bedTemp,
-            density = density
+            manufacturer = if (vendorName.isEmpty()) "Unknown" else vendorName,
+            colorName = if (colorName.isEmpty()) "Custom" else colorName,
+            colors = if (filamentColors.isEmpty()) listOf(Color.White) else filamentColors,
+            targetDiameter = actualDiameter,
+            targetWeight = actualWeight,
+            printTemp = actualPrintTemp,
+            bedTemp = actualBedTemp,
+            density = actualDensity
         )
     }
 
