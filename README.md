@@ -1,9 +1,28 @@
-
-# :iphone: Android App - Spoolman Companion
+# Android App - Spoolman Companion
 
 A quick Android app that allows you to write NDEF records on NFC/RFID tags, from your mobile phone.
 
 Combined with [nfc2klipper](https://github.com/bofh69/nfc2klipper) it allows you to quickly load filament from a simple NFC tag.
+
+## Fork Features
+
+This fork adds support for **[OpenTag3D](https://opentag3d.com/)** - an open standard for 3D printing filament NFC tags.
+
+When writing an NFC tag, the app now writes **both formats**:
+- **nfc2klipper** format - for Klipper integration
+- **OpenTag3D** format - for cross-platform compatibility
+
+### OpenTag3D Data Written
+
+The following filament data is encoded per the OpenTag3D spec:
+- Material type (base + modifiers)
+- Manufacturer name
+- Color name and RGBA values
+- Filament diameter and weight
+- Print and bed temperatures
+- Material density
+
+This allows your filament tags to be read by any OpenTag3D-compatible reader or application.
 
 # Overview
 
@@ -13,7 +32,7 @@ I made this app because I was tired of having to go to the printer NFC reader/wr
 
 This app lets you simply choose a spool - from your [Spoolman](https://github.com/Donkie/Spoolman) database - and write the associated NFC tag. 
 
-And all this, from your mobile phone !
+And all this, from your mobile phone!
 
 ## Tech
 
